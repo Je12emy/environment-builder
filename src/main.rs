@@ -10,11 +10,7 @@ use std::{
 fn main() {
     println!("Environment Builder");
     // Read settings
-    let settings = Config::builder()
-        .add_source(config::File::with_name("settings.yaml"))
-        .build()
-        .unwrap();
-
+    let settings = read_settings();
     // Get path
     let path = read_property_list("paths", &settings);
     println!("Selected path: {}", path.green());
@@ -67,4 +63,27 @@ fn read_property_list(property: &str, config: &Config) -> String {
     // Convert input to usize
     let input: usize = input.parse().unwrap();
     return options[input].clone();
+}
+
+fn read_settings() -> Config {
+    // Check OS and set path
+    let mut settings_path = String::new();
+    let home_dir = dirs::home_dir().unwrap();
+    let os = env::consts::OS;
+    if os == "windows" {
+        settings_path = format!(
+            "{}\\.environment-builder\\settings.yaml",
+            home_dir.to_str().unwrap()
+        );
+    } else {
+        settings_path = format!(
+            "{}/environment-builder/settings.yaml",
+            home_dir.to_string_lossy()
+        );
+    }
+    let settings = Config::builder()
+        .add_source(config::File::with_name(&settings_path))
+        .build()
+        .unwrap();
+    return settings;
 }
