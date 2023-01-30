@@ -1,21 +1,22 @@
 use std::{
     env,
-    io::{self, Write},
+    io::{self},
     path::Path,
     process::Command,
 };
 
+use config::Config;
+
 fn main() {
     println!("Environment Builder");
+    // Read toml file's settings
+    let settings = Config::builder()
+        .add_source(config::File::with_name("settings"))
+        .build()
+        .unwrap();
+    let path: String = settings.get("path").unwrap();
     // Change directories
-    let mut root = String::new();
-    println!("Please enter a directory path: ");
-    io::stdin()
-        .read_line(&mut root)
-        .expect("An error ocurred reading line");
-    println!("Path is: {}", root);
-    let root = root.trim();
-    let root_path = Path::new(&root);
+    let root_path = Path::new(&path);
     env::set_current_dir(&root_path).expect("An error ocurred while changing directories");
 
     // Get ticket key
