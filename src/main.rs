@@ -2,7 +2,7 @@ use std::{
     env,
     io::{self},
     path::Path,
-    process::Command,
+    process::Command, fs::read,
 };
 
 use config::Config;
@@ -14,45 +14,17 @@ fn main() {
         .add_source(config::File::with_name("settings.yaml"))
         .build()
         .unwrap();
-    // Print paths
-    let paths: Vec<String> = settings.get("paths").unwrap();
-    // Print items inside paths vec
-    for (i, path) in paths.iter().enumerate() {
-        println!("{}: {}", i, path);
-    }    
-    // Get user input
-    let mut input = String::new();
-    println!("Please enter a number:");
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Error reading number");
-    let input = input.trim();
-    // Convert input to usize
-    let input: usize = input.parse().unwrap();
-    // Print selected path
-    println!("Selected path: {}", paths[input]);
 
+    // Get path
+    let path = read_property_list("paths", &settings);
+    println!("Selected path: {}", path);
     // Change directories
-    let root_path = Path::new(&paths[input]);
+    let root_path = Path::new(&path);
     env::set_current_dir(&root_path).expect("An error ocurred while changing directories");
 
     // Get ticket key
-    let keys: Vec<String> = settings.get("keys").unwrap();
-    // Print items inside keys vec
-    for (i, key) in keys.iter().enumerate() {
-        println!("{}: {}", i, key);
-    }
-    // Get user input
-    let mut input = String::new();
-    println!("Please enter a number:");
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Error reading number");
-    let input = input.trim();
-    // Convert input to usize
-    let input: usize = input.parse().unwrap();
-    // Print selected key
-    println!("Selected key: {}", keys[input]);
+    let key = read_property_list("keys", &settings);   // Print selected key
+    println!("Selected key: {}", key);
 
     // Get a ticket number
     let mut ticket = String::new();
@@ -66,9 +38,9 @@ fn main() {
     let worktree_command = Command::new("git")
         .arg("worktree")
         .arg("add")
-        .arg(format!("{}-{}", &keys[input], ticket))
+        .arg(format!("{}-{}", &key, ticket))
         .arg("-b")
-        .arg(format!("feature/{}", keys[input]))
+        .arg(format!("feature/{}-{}", key, ticket))
         .status()
         .expect("An error ocurred while running worktree add");
     if worktree_command.success() {
@@ -76,4 +48,21 @@ fn main() {
     } else {
         println!("Failed to create new worktree");
     }
+}
+
+fn read_property_list(property: &str, config: &Config) -> String {
+    let options: Vec<String> = config.get(property).unwrap();
+    for (i, path) in options.iter().enumerate() {
+        println!("{}: {}", i, path);
+    }
+    // Get user input
+    let mut input = String::new();
+    println!("Please pick an option:");
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Error reading number");
+    let input = input.trim();
+    // Convert input to usize
+    let input: usize = input.parse().unwrap();
+    return options[input].clone();
 }
