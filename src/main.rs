@@ -1,6 +1,6 @@
 use std::{
     env,
-    io::{self},
+    io::{self, Write},
     path::Path,
     process::Command, fs::read,
 };
@@ -25,10 +25,10 @@ fn main() {
     // Get ticket key
     let key = read_property_list("keys", &settings);   // Print selected key
     println!("Selected key: {}", key);
-
     // Get a ticket number
     let mut ticket = String::new();
-    println!("Please enter a ticket number:");
+    print!("Please enter a ticket number: ");
+    io::stdout().flush().unwrap();
     io::stdin()
         .read_line(&mut ticket)
         .expect("Error reading ticket number");
@@ -57,7 +57,9 @@ fn read_property_list(property: &str, config: &Config) -> String {
     }
     // Get user input
     let mut input = String::new();
-    println!("Please pick an option:");
+    print!("Please pick an option: ");
+    io::stdout().flush().unwrap();
+
     io::stdin()
         .read_line(&mut input)
         .expect("Error reading number");
