@@ -1,11 +1,11 @@
+use colored::Colorize;
+use config::Config;
 use std::{
     env,
     io::{self, Write},
     path::Path,
-    process::Command, fs::read,
+    process::Command,
 };
-
-use config::Config;
 
 fn main() {
     println!("Environment Builder");
@@ -17,14 +17,14 @@ fn main() {
 
     // Get path
     let path = read_property_list("paths", &settings);
-    println!("Selected path: {}", path);
+    println!("Selected path: {}", path.green());
     // Change directories
     let root_path = Path::new(&path);
     env::set_current_dir(&root_path).expect("An error ocurred while changing directories");
 
     // Get ticket key
-    let key = read_property_list("keys", &settings);   // Print selected key
-    println!("Selected key: {}", key);
+    let key = read_property_list("keys", &settings); // Print selected key
+    println!("Selected key: {}", key.green());
     // Get a ticket number
     let mut ticket = String::new();
     print!("Please enter a ticket number: ");
@@ -44,9 +44,9 @@ fn main() {
         .status()
         .expect("An error ocurred while running worktree add");
     if worktree_command.success() {
-        println!("Created new worktree and branch");
+        println!("{}", "Created new worktree and branch".green());
     } else {
-        println!("Failed to create new worktree");
+        println!("{}", "Failed to create new worktree".red());
     }
 }
 
