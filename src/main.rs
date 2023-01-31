@@ -1,5 +1,5 @@
 use colored::Colorize;
-use config::Config;
+use environment_builder::settings::read;
 use std::{
     env,
     io::{self, Write},
@@ -10,16 +10,16 @@ use std::{
 fn main() {
     println!("Environment Builder");
     // Read settings
-    let settings = read_settings();
+    let settings = read::get_settings();
     // Get path
-    let path = read_property_list("paths", &settings);
+    let path = read::get_property_list("paths", &settings);
     println!("Selected path: {}", path.green());
     // Change directories
     let root_path = Path::new(&path);
     env::set_current_dir(&root_path).expect("An error ocurred while changing directories");
 
     // Get ticket key
-    let key = read_property_list("keys", &settings); // Print selected key
+    let key = read::get_property_list("keys", &settings); // Print selected key
     println!("Selected key: {}", key.green());
     // Get a ticket number
     let mut ticket = String::new();
@@ -44,46 +44,4 @@ fn main() {
     } else {
         println!("{}", "Failed to create new worktree".red());
     }
-}
-
-fn read_property_list(property: &str, config: &Config) -> String {
-    let options: Vec<String> = config.get(property).unwrap();
-    for (i, path) in options.iter().enumerate() {
-        println!("{}: {}", i, path);
-    }
-    // Get user input
-    let mut input = String::new();
-    print!("Please pick an option: ");
-    io::stdout().flush().unwrap();
-
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Error reading number");
-    let input = input.trim();
-    // Convert input to usize
-    let input: usize = input.parse().unwrap();
-    return options[input].clone();
-}
-
-fn read_settings() -> Config {
-    // Check OS and set path
-    let mut settings_path = String::new();
-    let home_dir = dirs::home_dir().unwrap();
-    let os = env::consts::OS;
-    if os == "windows" {
-        settings_path = format!(
-            "{}\\.environment-builder\\settings.yaml",
-            home_dir.to_str().unwrap()
-        );
-    } else {
-        settings_path = format!(
-            "{}/environment-builder/settings.yaml",
-            home_dir.to_string_lossy()
-        );
-    }
-    let settings = Config::builder()
-        .add_source(config::File::with_name(&settings_path))
-        .build()
-        .unwrap();
-    return settings;
 }
