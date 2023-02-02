@@ -1,5 +1,5 @@
 use colored::Colorize;
-use environment_builder::settings::read;
+use environment_builder::settings;
 use std::{
     env,
     io::{self, Write},
@@ -10,16 +10,18 @@ use std::{
 fn main() {
     println!("Environment Builder");
     // Read settings
-    let settings = read::get_settings();
-    // Get path
-    let path = read::get_property_list("paths", &settings);
-    println!("Selected path: {}", path.green());
+    let settings = settings::read_settings();
+    // Get repositories
+    let paths = settings.get_array("paths").unwrap();
+    let selected_path = settings::pick_option(&paths);
+    println!("Selected path: {}", selected_path.green());
     // Change directories
-    let root_path = Path::new(&path);
+    let root_path = Path::new(&selected_path);
     env::set_current_dir(&root_path).expect("An error ocurred while changing directories");
 
     // Get ticket key
-    let key = read::get_property_list("keys", &settings); // Print selected key
+    let keys = settings.get_array("keys").unwrap();
+    let key = settings::pick_option(&keys); // Print selected key
     println!("Selected key: {}", key.green());
     // Get a ticket number
     let mut ticket = String::new();
