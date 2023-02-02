@@ -1,5 +1,5 @@
 use colored::Colorize;
-use environment_builder::{settings, commands};
+use environment_builder::{commands, settings, jira::{JiraTicket}};
 use std::{
     env,
     io::{self, Write},
@@ -30,7 +30,30 @@ fn main() {
         .read_line(&mut ticket)
         .expect("Error reading ticket number");
     let ticket = ticket.trim();
+    let ticket = ticket.parse::<u32>().unwrap();
 
+    let jira_ticket = JiraTicket::new(key, ticket);
     // Run worktree
-    commands::add_worktree(key, ticket.to_string());
+    commands::add_worktree(&jira_ticket);
+
+    // Ask to open VSCode
+    loop {
+        let mut open_vscode = String::new();
+        print!("Open VSCode? (y/n): ");
+        io::stdout().flush().unwrap();
+        io::stdin()
+            .read_line(&mut open_vscode)
+            .expect("Error reading answer");
+        let open_vscode = open_vscode.trim();
+        if open_vscode == "y" {
+            commands::open_vscode(Some(&jira_ticket));
+            break;
+        } else if open_vscode == "n" {
+            break;
+        } else {
+            println!("Invalid option");
+            continue;
+        }
+    }
+    println!("{}", "All done!".green());
 }
