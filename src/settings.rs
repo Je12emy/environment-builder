@@ -7,7 +7,9 @@ use std::{
 
 #[derive(Debug, Deserialize, Clone, Copy)]
 pub enum RepositoryManagementMethod {
+    #[serde(rename = "worktree")]
     Worktree,
+    #[serde(rename = "branch")]
     Branch,
 }
 
@@ -26,11 +28,11 @@ pub struct RepositorySettings {
     pub path: String,
     pub method: RepositoryManagementMethod,
     pub keys: Vec<String>,
-    #[serde(alias = "auto-pull")]
+    #[serde(rename = "auto-pull")]
     pub auto_pull: bool,
-    #[serde(alias = "set-remote")]
+    #[serde(rename = "set-remote")]
     pub set_remote: bool,
-    #[serde(alias = "base-branch")]
+    #[serde(rename = "base-branch")]
     pub base_branch: String,
 }
 
