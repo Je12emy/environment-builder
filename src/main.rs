@@ -1,8 +1,8 @@
 use colored::Colorize;
 use environment_builder::{
-    commands::{self, RepositoryManagementMethod},
+    commands::{self},
     jira::JiraTicket,
-    settings,
+    settings::{self, RepositoryManagementMethod},
 };
 use std::{
     env,
@@ -13,31 +13,28 @@ use std::{
 fn main() {
     println!("Environment Builder");
     // Read settings
-    let settings = settings::read_settings();
+    let settings = settings::read_settings().unwrap();
+
     // Get repositories
-    let repositories = settings.get_array("repositories");
-    let repositories = match repositories {
-        Ok(repositories) => repositories,
-        Err(_) => {
-            println!("{}", "No repositories found in settings.toml".red());
-            return;
-        }
-    };
-    let selected_repository = settings::pick_option(&repositories);
-    println!("Selected repository: {}", selected_repository.green());
+    let repositories = settings.repositories;
+    if repositories.len() == 0 {
+        println!("{}", "No repositories found in settings.toml".red());
+        return;
+    }
+
+    // Pick a repository
+    let selected_repository = settings::pick_repository(&repositories);
+
     // Change directories
-    let root_path = Path::new(&selected_repository);
+    let root_path = Path::new(&selected_repository.path);
     env::set_current_dir(&root_path).expect("An error ocurred while changing directories");
 
     // Get ticket key
-    let keys = settings.get_array("keys");
-    let keys = match keys {
-        Ok(keys) => keys,
-        Err(_) => {
-            println!("{}", "No keys found in settings.toml".red());
-            return;
-        }
-    };
+    let keys = selected_repository.keys.clone();
+    if keys.len() == 0 {
+        println!("{}", "No repositories found in settings.toml".red());
+        return;
+    }
     let key = settings::pick_option(&keys); // Print selected key
     println!("Selected key: {}", key.green());
     // Get a ticket number
@@ -58,8 +55,8 @@ fn main() {
     };
     let jira_ticket = JiraTicket::new(key, ticket);
 
-    let management_method = settings.get_string("management-method").unwrap();
-    let management_method = RepositoryManagementMethod::from_string(&management_method);
+    let management_method = selected_repository.method.clone();
+    // Need a fancier way to do this lol
     match management_method {
         RepositoryManagementMethod::Worktree => {
             commands::add_worktree(&jira_ticket);

@@ -3,21 +3,6 @@ use std::{env, process::Command};
 
 use crate::jira::JiraTicket;
 
-pub enum RepositoryManagementMethod {
-    Worktree,
-    Branch,
-}
-
-impl RepositoryManagementMethod {
-    pub fn from_string(method: &str) -> RepositoryManagementMethod {
-        match method {
-            "worktree" => RepositoryManagementMethod::Worktree,
-            "branch" => RepositoryManagementMethod::Branch,
-            _ => RepositoryManagementMethod::Branch,
-        }
-    }
-}
-
 pub fn add_worktree(ticket: &JiraTicket) {
     let worktree_command = Command::new("git")
         .arg("worktree")
