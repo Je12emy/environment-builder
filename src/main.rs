@@ -1,5 +1,9 @@
 use colored::Colorize;
-use environment_builder::{commands, jira::JiraTicket, settings};
+use environment_builder::{
+    commands::{self, RepositoryManagementMethod},
+    jira::JiraTicket,
+    settings,
+};
 use std::{
     env,
     io::{self, Write},
@@ -15,7 +19,7 @@ fn main() {
     let repositories = match repositories {
         Ok(repositories) => repositories,
         Err(_) => {
-            println!("{}","No repositories found in settings.toml".red());
+            println!("{}", "No repositories found in settings.toml".red());
             return;
         }
     };
@@ -30,7 +34,7 @@ fn main() {
     let keys = match keys {
         Ok(keys) => keys,
         Err(_) => {
-            println!("{}","No keys found in settings.toml".red());
+            println!("{}", "No keys found in settings.toml".red());
             return;
         }
     };
@@ -48,13 +52,22 @@ fn main() {
     let ticket = match ticket {
         Ok(ticket) => ticket,
         Err(_) => {
-            println!("{}","Please enter a number".red());
+            println!("{}", "Please enter a number".red());
             return;
         }
     };
     let jira_ticket = JiraTicket::new(key, ticket);
-    // Run worktree
-    commands::add_worktree(&jira_ticket);
+
+    let management_method = settings.get_string("management-method").unwrap();
+    let management_method = RepositoryManagementMethod::from_string(&management_method);
+    match management_method {
+        RepositoryManagementMethod::Worktree => {
+            commands::add_worktree(&jira_ticket);
+        }
+        RepositoryManagementMethod::Branch => {
+            commands::create_branch(&jira_ticket);
+        },
+    }
 
     // Ask to open VSCode
     loop {
