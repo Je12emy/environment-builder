@@ -26,12 +26,12 @@ impl RepositoryManagementMethod {
 #[derive(Debug, Deserialize)]
 pub struct RepositorySettings {
     pub path: String,
-    pub method: RepositoryManagementMethod,
+    pub method: Option<RepositoryManagementMethod>,
     pub keys: Vec<String>,
     #[serde(rename = "auto-pull")]
-    pub auto_pull: bool,
+    pub auto_pull: Option<bool>,
     #[serde(rename = "set-remote")]
-    pub set_remote: bool,
+    pub set_remote: Option<bool>,
     #[serde(rename = "base-branch")]
     pub base_branch: String,
 }

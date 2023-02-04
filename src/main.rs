@@ -55,23 +55,37 @@ fn main() {
     };
     let jira_ticket = JiraTicket::new(key, ticket);
 
-    if selected_repository.auto_pull {
-        commands::update_repository(&selected_repository.base_branch)
+    match selected_repository.auto_pull {
+        Some(should_update) => {
+            if should_update {
+                commands::update_repository(&selected_repository.base_branch)
+            }
+        }
+        None => (),
     }
 
     let management_method = selected_repository.method.clone();
-    // Need a fancier way to do this lol
     match management_method {
-        RepositoryManagementMethod::Worktree => {
-            commands::add_worktree(&jira_ticket, &selected_repository.base_branch);
-        }
-        RepositoryManagementMethod::Branch => {
+        Some(method) => match method {
+            RepositoryManagementMethod::Worktree => {
+                commands::add_worktree(&jira_ticket, &selected_repository.base_branch);
+            }
+            RepositoryManagementMethod::Branch => {
+                commands::create_branch(&jira_ticket, &selected_repository.base_branch);
+            }
+        },
+        None => {
             commands::create_branch(&jira_ticket, &selected_repository.base_branch);
         }
     }
 
-    if selected_repository.set_remote {
-        commands::set_upstream(&jira_ticket);
+    match selected_repository.set_remote {
+        Some(should_set_remote) => {
+            if should_set_remote {
+                commands::set_upstream(&jira_ticket);
+            }
+        }
+        None => (),
     }
 
     // Ask to open VSCode
