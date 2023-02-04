@@ -2,7 +2,7 @@ use config::{Config, ConfigError};
 use serde::Deserialize;
 use std::{
     env,
-    io::{self, Write}, collections::HashMap,
+    io::{self, Write},
 };
 
 #[derive(Debug, Deserialize, Clone, Copy)]

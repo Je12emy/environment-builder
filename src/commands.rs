@@ -3,13 +3,14 @@ use std::{env, process::Command};
 
 use crate::jira::JiraTicket;
 
-pub fn add_worktree(ticket: &JiraTicket) {
+pub fn add_worktree(ticket: &JiraTicket, base_branch: &str) {
     let worktree_command = Command::new("git")
         .arg("worktree")
         .arg("add")
         .arg(ticket.to_string())
         .arg("-b")
         .arg(format!("feature/{}", ticket.to_string()))
+        .arg(base_branch)
         .status()
         .expect("An error ocurred while running worktree add");
     if worktree_command.success() {
@@ -19,13 +20,14 @@ pub fn add_worktree(ticket: &JiraTicket) {
     }
 }
 
-fn update_repository() {
+pub fn update_repository(base_branch: &str) {
     let update_command = Command::new("git")
         .arg("pull")
         .arg("origin")
-        .arg("develop")
+        .arg(base_branch)
         .status()
         .expect("An error ocurred while running git pull");
+
     if update_command.success() {
         println!("{}", "Updated repository".green());
     } else {
@@ -48,10 +50,11 @@ pub fn set_upstream(ticket: &JiraTicket) {
     }
 }
 
-pub fn create_branch(ticket: &JiraTicket) {
+pub fn create_branch(ticket: &JiraTicket, base_branch: &str) {
     let branch_command = Command::new("git")
         .arg("branch")
         .arg(format!("feature/{}", ticket.to_string()))
+        .arg(base_branch)
         .status()
         .expect("An error ocurred while creating new branch");
     if branch_command.success() {
