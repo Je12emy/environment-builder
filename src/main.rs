@@ -1,6 +1,6 @@
 use colored::Colorize;
 use environment_builder::{
-    commands::{self},
+    commands,
     jira::JiraTicket,
     settings::{self, RepositoryManagementMethod},
 };
@@ -13,7 +13,10 @@ use std::{
 fn main() {
     println!("Environment Builder");
     // Read settings
-    let settings = settings::read_settings().unwrap();
+    let settings = match settings::read_settings() {
+        Ok(s) => s,
+        Err(_) => panic!("Settings where not found"),
+    };
 
     // Get repositories
     let repositories = settings.repositories;

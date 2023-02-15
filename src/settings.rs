@@ -53,7 +53,7 @@ pub fn read_settings() -> Result<UserSettings, ConfigError> {
         );
     } else {
         _settings_path = format!(
-            "{}/environment-builder/settings.json",
+            "{}/.config/environment-builder/settings.json",
             home_dir.to_string_lossy()
         );
     }
