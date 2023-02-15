@@ -1,0 +1,34 @@
+{
+  "repositories": [
+    {
+      "path": "C:\\Users\\Jeremy.Rodriguez\\Documents\\code\\work\\healthclips-online.git",
+      "method": "worktree",
+      "base-branch": "develop",
+      "auto-pull": true,
+      "set-remote": false,
+      "keys": ["THCO"]
+    },
+    {
+      "path": "C:\\Users\\Jeremy.Rodriguez\\Documents\\code\\side-projects\\sample-repo",
+      "method": "worktree",
+      "base-branch": "main",
+      "auto-pull": true,
+      "set-remote": true,
+      "keys": ["TCARE", "THCO", "TCC", "TIDS"]
+    },
+    {
+      "path": "C:\\Users\\Jeremy.Rodriguez\\Documents\\code\\side-projects\\another-sample-repo",
+      "base-branch": "main",
+      "keys": ["TCC", "TIDS"]
+    },
+    {
+      "path": "C:\\Users\\Jeremy.Rodriguez\\Documents\\code\\work\\continued_care",
+      "method": "branch",
+      "base-branch": "develop",
+      "auto-pull": true,
+      "set-remote": false,
+      "keys": ["TCC", "TCARE"]
+    }
+  ],
+  "editor": "vscode"
+}
